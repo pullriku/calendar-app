@@ -1,0 +1,12 @@
+---
+type Props = {
+    inputId: string,
+    label: string,
+};
+
+const { inputId, label }: Props = Astro.props;
+---
+<div class="m-1 p-4 bg-white dark:bg-slate-700 rounded-lg">
+    <label for={inputId}><p class="font-bold">{label}</p></label>
+    <input type="file" name={inputId} id={inputId} formenctype="multipart/form-data" accept="image/jpeg, image/png" required aria-required="true"/>
+</div>

@@ -1,0 +1,20 @@
+[package]
+name = "calendar-app"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "bootstrap"
+path = "src/main.rs"
+
+[dependencies]
+axum = { version = "0.7.9", features = ["form", "macros", "multipart"] }
+env_logger = "0.11.6"
+log = "0.4.22"
+tempdir = "0.3.7"
+tokio = { version = "1.42.0", features = ["full"] }
+tower = "0.5.2"
+tower-http = { version = "0.6.2", features = ["fs"] }
+typst = "0.12.0"
+typst-as-lib = "0.11.1"
+typst-pdf = "0.12.0"

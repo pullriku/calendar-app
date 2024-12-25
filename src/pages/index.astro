@@ -1,11 +1,19 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Form from "../components/Form.astro";
+import BasicLayout from "../layouts/BasicLayout.astro";
+import Desc from "../layouts/Desc.astro";
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<BasicLayout>
+	<Desc>
+		<h1>カレンダーアプリへようこそ</h1>
+		<p>
+			オリジナルのカレンダーを作成できるアプリです。お気に入りの写真やイラストをアップロードするだけで、月ごとのカレンダーPDFを生成できます。各月の写真やイラストを選択して、「作成」ボタンを押してください。
+		</p>
+		<p>
+			Chrome拡張機能「Google Scholar PDF Reader」が有効化されている場合は、エラー表示が出ることがありますが、問題なく使用できます。
+		</p>
+
+	</Desc>
+	<Form />
+</BasicLayout>

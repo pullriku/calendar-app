@@ -1,0 +1,24 @@
+---
+import Button from "../layouts/Button.astro";
+import ImageSelect from "../components/ImageSelect.astro";
+
+const monthsId = [
+    "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"
+];
+
+const jpMonths = Array.from({length: 12}, (_, i) => `${i + 1}月`);
+---
+
+<form action="/make" method="post" enctype="multipart/form-data" class="flex flex-col p-4">
+    {
+        monthsId.map((id, index) => (
+            <ImageSelect inputId={id} label={jpMonths[index]}/>
+        ))
+    }
+
+    <div class="p-1 mt-4">
+        <div class="flex justify-center">
+            <Button type="submit">作成</Button>
+        </div>
+    </div>
+</form>
