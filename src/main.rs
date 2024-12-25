@@ -12,8 +12,7 @@ use typst::{
 };
 use typst_as_lib::TypstTemplate;
 
-// #[tokio::main]
-#[tokio::main(flavor = "current_thread")]
+#[tokio::main]
 async fn main() {
     env::set_var("RUST_LOG", "debug");
     env_logger::init();
