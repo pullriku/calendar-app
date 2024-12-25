@@ -41,15 +41,17 @@ async fn main() {
 
     let listener = TcpListener::bind((Ipv4Addr::UNSPECIFIED, port))
         .await
-        .unwrap();
+        .expect("failed to bind address");
 
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, app)
+        .await
+        .expect("server failed to start");
 }
 
 #[debug_handler]
 async fn make(mut multipart: Multipart) -> impl IntoResponse {
-    let font_bold = Font::new(Bytes::from(FONT_BOLD), 0).unwrap();
-    let font_medium = Font::new(Bytes::from(FONT_MEDIUM), 0).unwrap();
+    let font_bold = Font::new(Bytes::from(FONT_BOLD), 0).expect("Failed to load bold font");
+    let font_medium = Font::new(Bytes::from(FONT_MEDIUM), 0).expect("Failed to load medium font");
 
     let Ok(tempdir) = tempdir::TempDir::new("photos") else {
         return response(500, "Failed to receive file");
@@ -95,12 +97,12 @@ async fn make(mut multipart: Multipart) -> impl IntoResponse {
     axum::http::Response::builder()
         .header("Content-Type", "application/pdf")
         .body(Body::from(pdf))
-        .unwrap()
+        .expect("failed to build pdf response")
 }
 
 fn response(code: u16, message: &'static str) -> axum::http::Response<Body> {
     axum::http::Response::builder()
         .status(code)
         .body(Body::from(message))
-        .unwrap()
+        .expect("failed to build response")
 }
