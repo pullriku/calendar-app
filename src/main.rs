@@ -109,7 +109,6 @@ async fn make(mut multipart: Multipart) -> impl IntoResponse {
         .header("Content-Type", "application/pdf")
         .body(Body::from(pdf))
         .expect("failed to build pdf response")
-
 }
 
 fn response(code: u16, message: String) -> axum::http::Response<Body> {
