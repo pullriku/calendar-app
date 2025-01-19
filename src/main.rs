@@ -8,7 +8,7 @@ use axum::{
     routing::post,
     Router,
 };
-use log::info;
+use log::{debug, info};
 use tokio::net::TcpListener;
 use tower_http::services::ServeDir;
 use typst::{
@@ -43,6 +43,8 @@ async fn main() {
         .await
         .expect("failed to bind address");
 
+    info!("listening on http://0.0.0.0:{}", port);
+
     axum::serve(listener, app)
         .await
         .expect("server failed to start");
@@ -50,11 +52,13 @@ async fn main() {
 
 #[debug_handler]
 async fn make(mut multipart: Multipart) -> impl IntoResponse {
+    info!("make");
+
     let font_bold = Font::new(Bytes::from(FONT_BOLD), 0).expect("Failed to load bold font");
     let font_medium = Font::new(Bytes::from(FONT_MEDIUM), 0).expect("Failed to load medium font");
 
-    let Ok(tempdir) = tempdir::TempDir::new("photos") else {
-        return response(500, "Failed to receive file");
+    let Ok(tempdir) = tempdir::TempDir::new(&format!("photos-{}", uuid::Uuid::new_v4())) else {
+        return response(500, "Failed to receive file".to_string());
     };
 
     let template = TypstTemplate::new([font_bold, font_medium], CONTENT)
@@ -69,9 +73,13 @@ async fn make(mut multipart: Multipart) -> impl IntoResponse {
         }
 
         let month = field.name().unwrap_or_default().to_string();
+
+        // dbg!(&month);
         let Ok(photo) = field.bytes().await else {
             continue;
         };
+
+        debug!("photo size: {} bytes", photo.len());
 
         if photo.is_empty() {
             continue;
@@ -81,26 +89,30 @@ async fn make(mut multipart: Multipart) -> impl IntoResponse {
             .await
             .is_err()
         {
-            return response(500, "Failed to receive file");
+            return response(500, "Failed to receive file".to_string());
         };
 
         dict.insert(Str::from(month.clone()), Value::Str(Str::from(month)));
     }
 
-    let Ok(doc) = template.compile_with_input(dict).output else {
-        return response(500, "Failed to compile document");
+    let doc = match template.compile_with_input(dict).output {
+        Ok(doc) => doc,
+        Err(e) => return response(500, format!("Failed to compile document: {:?}", e)),
     };
 
     let options: typst_pdf::PdfOptions<'_> = Default::default();
     let pdf = typst_pdf::pdf(&doc, &options).unwrap_or_default();
 
+    drop(tempdir);
+
     axum::http::Response::builder()
         .header("Content-Type", "application/pdf")
         .body(Body::from(pdf))
         .expect("failed to build pdf response")
+
 }
 
-fn response(code: u16, message: &'static str) -> axum::http::Response<Body> {
+fn response(code: u16, message: String) -> axum::http::Response<Body> {
     axum::http::Response::builder()
         .status(code)
         .body(Body::from(message))

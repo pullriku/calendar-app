@@ -111,7 +111,7 @@
 
   let half_upper = box(height: 50%, width: 100%)[
     #place(bottom + right, dy: -3em, dx: -2em)[
-      #text(size: 7em, weight: "black", fill: white)[#month_datetime.display(month_format)]
+        #text(size: 7em, weight: "black", fill: white)[#month_datetime.display(month_format)]
     ]
   ]
 

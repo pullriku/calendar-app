@@ -1,0 +1,15 @@
+---
+import BlueBox from "../layouts/BlueBox.astro";
+import Prose from "../layouts/Prose.astro";
+---
+
+<div class="pdf-preview p-4" hidden> {/* hidden */}
+    <Prose>
+        <h2>結果</h2>
+        <div class="w-fit">
+            <a download="calendar.pdf" class="mb-4 no-underline"><BlueBox>ダウンロード</BlueBox></a>
+        </div>
+        <embed type="application/pdf" width="100%" height="600px"/>
+         <!-- <iframe width="100%" height="600px"></iframe> -->
+    </Prose>
+</div>

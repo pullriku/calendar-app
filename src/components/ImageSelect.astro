@@ -8,5 +8,5 @@ const { inputId, label }: Props = Astro.props;
 ---
 <div class="m-1 p-4 bg-white dark:bg-slate-700 rounded-lg">
     <label for={inputId}><p class="font-bold">{label}</p></label>
-    <input type="file" name={inputId} id={inputId} formenctype="multipart/form-data" accept="image/jpeg, image/png" required aria-required="true"/>
+    <input type="file" size="25" class="text-sm image-select" name={inputId} id={inputId} accept="image/jpeg, image/png" required aria-required="true"/>
 </div>

@@ -1,6 +1,7 @@
 ---
 import Button from "../layouts/Button.astro";
 import ImageSelect from "../components/ImageSelect.astro";
+import Icon from "astro-iconify";
 
 const monthsId = [
     "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"
@@ -12,13 +13,93 @@ const jpMonths = Array.from({length: 12}, (_, i) => `${i + 1}月`);
 <form action="/make" method="post" enctype="multipart/form-data" class="flex flex-col p-4">
     {
         monthsId.map((id, index) => (
-            <ImageSelect inputId={id} label={jpMonths[index]}/>
+            <ImageSelect inputId={id} label={jpMonths[index]} />
         ))
     }
 
     <div class="p-1 mt-4">
         <div class="flex justify-center">
             <Button type="submit">作成</Button>
+            <span id="loading" hidden>
+                <Icon name="eos-icons:three-dots-loading" size="48"/>
+            </span>
         </div>
     </div>
 </form>
+
+<script>
+    import imageCompression from 'browser-image-compression';
+    
+    const form = document.querySelector('form')!;
+    const button = document.getElementsByClassName("submit-button")[0] as HTMLButtonElement;
+    const loading = document.getElementById('loading')!;
+
+
+    form.addEventListener("submit", async (e) =>{
+        e.preventDefault();
+
+        button.disabled = true;
+        loading.hidden = false;
+        
+        const formData = new FormData(form);
+
+        const newData = new FormData();
+
+        const entries = formData.entries();
+        for (const [name, image] of Array.from(entries)) {
+            if (image instanceof File && /^image/.test(image.type)) {
+                console.log("image", name, image);
+                // formData.delete(name);
+                newData.append(name, await compressImage(image));
+
+                // const newInput = document.createElement("input")
+
+                
+                // const fileList = window
+                // fileList[0] = image;
+                // exitingInput.files = fileList;
+            } else {
+                console.log("not image", name, image);
+                newData.append(name, image);
+            }
+        }
+
+        console.log("formData", newData);
+        
+        const pdf = await fetch("/make", {
+            method: "POST",
+            body: newData
+        }).then(res => res.blob());
+
+        const url = URL.createObjectURL(pdf);
+        const pdfPreview = document.querySelector('.pdf-preview') as HTMLDivElement;
+        const embed = pdfPreview.querySelector('embed') as HTMLEmbedElement;
+        // const iframe = pdfPreview.querySelector('iframe') as HTMLIFrameElement;
+        const a = pdfPreview.querySelector('a') as HTMLAnchorElement;
+        a.href = url;
+        embed.src = `${url}#toolbar=1`;
+        // iframe.src = `pdfjs/web/viewer.html?file=${url}`;
+        pdfPreview.hidden = false;
+
+        button.disabled = false;
+        loading.hidden = true;
+    })
+
+    // imageSelect.forEach((input) => {
+    //     const name = (input as HTMLInputElement).name;
+    //     input.addEventListener("change", async (e) => {
+    //         const file = (e.target as HTMLInputElement).files![0];
+    //         const compressedFile = await compressImage(file);
+    //         console.log("compressed size(MB): ", compressedFile.size / 1024 / 1024);
+            
+    //         formData.set(name, compressedFile);
+    //         console.log(name , formData.get(name));
+            
+    //     });
+    // });
+
+    async function compressImage(file: File): Promise<File> {
+        const compressedFile = await imageCompression(file, {maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true});
+        return compressedFile;
+    }
+</script>
